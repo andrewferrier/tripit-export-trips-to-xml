@@ -1,5 +1,5 @@
 GIT
-  remote: git@github.com:muness/tripit_api.git
+  remote: https://github.com/muness/tripit_api.git
   revision: 71d7b48779b47d09f800c38f66ac505f8348086a
   ref: 71d7b48
   specs:
