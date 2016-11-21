@@ -52,7 +52,7 @@ t = TripIt::API.new(oauth_credential, API_URL)
 
 past_trips = t.list.trip('past' => 'true', 'include_objects' => 'false', 'traveler' => 'true', 'page_size' => '30')
 
-puts "There are #{past_trips['page_size']} pages of data. Retrieving them all."
+puts "There are #{past_trips['max_page']} pages of data. Retrieving them all."
 
 pages = past_trips['max_page'].to_i
 
