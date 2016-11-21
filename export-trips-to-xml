@@ -4,33 +4,51 @@ require 'nokogiri'
 require 'tripit'
 require 'yaml'
 
+PERMANENT_CREDENTIALS = 'permcreds.yml'
+
+API_URL = 'https://api.tripit.com/v1/'
+
 creds = YAML.load_file('creds.yml')
 consumer_key = creds['consumer_key']
 consumer_secret = creds['consumer_secret']
 
-api_url = 'https://api.tripit.com/v1/'
+if File.exists?(PERMANENT_CREDENTIALS)
+  permanent_credentials = YAML.load_file(PERMANENT_CREDENTIALS)
 
-oauth_credential = TripIt::OAuthCredential.new(consumer_key, consumer_secret)
-t = TripIt::API.new(oauth_credential, api_url)
+  authorized_token = permanent_credentials[:authorized_token]
+  authorized_token_secret = permanent_credentials[:authorized_token_secret]
+else
+  oauth_credential = TripIt::OAuthCredential.new(consumer_key, consumer_secret)
+  t = TripIt::API.new(oauth_credential, API_URL)
 
-request_token = t.get_request_token
+  request_token = t.get_request_token
 
-puts "\n\nUsing your brower, log in to Trip then go to:\n https://www.tripit.com/oauth/authorize?oauth_token=" \
-  "#{request_token.token}&oauth_callback=http://localhost:8080/ \nAuthorize this app to access your data. " \
-  'When you get to the localhost / page not found link, come back to this console and press enter.'
-gets.chomp
+  puts "\n\nUsing your brower, log in to Trip then go to:\n https://www.tripit.com/oauth/authorize?oauth_token=" \
+    "#{request_token.token}&oauth_callback=http://localhost:8080/ \nAuthorize this app to access your data. " \
+    'When you get to the localhost / page not found link, come back to this console and press enter.'
+  gets.chomp
 
-oauth_credential = TripIt::OAuthCredential.new(consumer_key, consumer_secret, request_token.token, request_token.token_secret)
-t = TripIt::API.new(oauth_credential, api_url)
+  oauth_credential = TripIt::OAuthCredential.new(consumer_key, consumer_secret, request_token.token, request_token.token_secret)
+  t = TripIt::API.new(oauth_credential, API_URL)
 
-access_token = t.get_access_token
+  access_token = t.get_access_token
 
-authorized_token        = access_token.token
-authorized_token_secret = access_token.token_secret
+  authorized_token        = access_token.token
+  authorized_token_secret = access_token.token_secret
+
+  permanent_credentials = {
+    'authorized_token': authorized_token,
+    'authorized_token_secret': authorized_token_secret
+  }
+
+  File.open(PERMANENT_CREDENTIALS,'w') do |f|
+    f.write permanent_credentials.to_yaml
+  end
+end
 
 oauth_credential = TripIt::OAuthCredential.new(consumer_key, consumer_secret,
                                                authorized_token, authorized_token_secret)
-t = TripIt::API.new(oauth_credential, api_url)
+t = TripIt::API.new(oauth_credential, API_URL)
 
 past_trips = t.list.trip('past' => 'true', 'include_objects' => 'false', 'traveler' => 'true', 'page_size' => '30')
 
