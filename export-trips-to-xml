@@ -65,11 +65,15 @@ pages = past_trips['max_page'].to_i
 trips = Nokogiri::XML::Builder.new do |xml_out|
   xml_out.Trips do
     for page in (1..pages)
-      puts "Retrieving page #{page} of #{pages}."
-      past_trips = t.list.trip('past' => 'true', 'include_objects' => 'true',
-                               'traveler' => 'all', 'page_size' => PAGE_SIZE, 'page_num' => page)
-      node = Nokogiri::XML(past_trips.to_xml.to_s)
-      xml_out << node.xpath('/*/node()').to_xml
+      begin
+        puts "Retrieving page #{page} of #{pages}."
+        past_trips = t.list.trip('past' => 'true', 'include_objects' => 'true',
+                                 'traveler' => 'all', 'page_size' => PAGE_SIZE, 'page_num' => page)
+        node = Nokogiri::XML(past_trips.to_xml.to_s)
+        xml_out << node.xpath('/*/node()').to_xml
+      rescue Net::HTTPServerException => e
+        puts "Exception #{e.to_yaml}"
+      end
     end
   end
 end
