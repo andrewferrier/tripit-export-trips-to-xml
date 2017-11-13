@@ -58,15 +58,12 @@ t = TripIt::API.new(oauth_credential, API_URL)
 
 past_trips = t.list.trip('past' => 'true', 'include_objects' => 'true', 'traveler' => 'all', 'page_size' => PAGE_SIZE)
 
-puts "There are #{past_trips['max_page']} pages of data. Retrieving them all."
-
 pages = past_trips['max_page'].to_i
 
 trips = Nokogiri::XML::Builder.new do |xml_out|
   xml_out.Trips do
     for page in (1..pages)
       begin
-        puts "Retrieving page #{page} of #{pages}."
         past_trips = t.list.trip('past' => 'true', 'include_objects' => 'true',
                                  'traveler' => 'all', 'page_size' => PAGE_SIZE, 'page_num' => page)
         node = Nokogiri::XML(past_trips.to_xml.to_s)
@@ -78,5 +75,4 @@ trips = Nokogiri::XML::Builder.new do |xml_out|
   end
 end
 
-puts 'Writing trip data to trips.xml'
 File.open('trips.xml', 'w') { |f| f.write(trips.to_xml.to_s) }
