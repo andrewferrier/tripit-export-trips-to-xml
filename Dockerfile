@@ -1,7 +1,7 @@
 # This Dockerfile is basically designed to provide a test harness within which
 # export-trips-to-xml can be roughly tested. It's not production-ready.
 
-FROM ubuntu:17.04
+FROM ubuntu:18.04
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     bundler \
