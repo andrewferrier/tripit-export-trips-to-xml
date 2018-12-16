@@ -3,6 +3,7 @@
 # TODO: Merge all responses into one in a syntactically correct way.
 
 import os
+import sys
 import xml.dom.minidom
 import yaml
 
@@ -15,7 +16,7 @@ PAGE_SIZE=5
 def print_xml(string):
     xmlval = xml.dom.minidom.parseString(string)
     pretty_xml_as_string = xmlval.toprettyxml()
-    print(pretty_xml_as_string)
+    sys.stdout.buffer.write(pretty_xml_as_string.encode('utf-8'))
 
 with open("creds.yml", 'r') as creds_stream:
     creds = yaml.load(creds_stream)
