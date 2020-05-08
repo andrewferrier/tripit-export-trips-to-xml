@@ -59,6 +59,7 @@ if not access_token:
         authorized_token_secret = access_token_secret
     )
 
+    print("Paste the following data into the file 'permcreds.yml' and re-run this script.")
     print(yaml.dump(data, default_flow_style=False))
 else:
     tripit = OAuth1Service(
